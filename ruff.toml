@@ -1,11 +1,10 @@
 # =============================================================================
-# RUFF CONFIGURATION
+# RUFF CONFIGURATION - shared settings
 # =============================================================================
 # Documentation: https://docs.astral.sh/ruff/configuration/
 # Rules reference: https://docs.astral.sh/ruff/rules/
 # =============================================================================
 
-[tool.ruff]
 # Require a specific ruff version range for consistent behavior across environments
 required-version = ">=0.8.0"
 
@@ -13,7 +12,7 @@ required-version = ">=0.8.0"
 line-length = 88
 indent-width = 4
 
-# Minimum Python version to target (adjust per-repo if needed)
+# Minimum Python version to target (override per-repo in pyproject.toml if needed)
 target-version = "py311"
 
 # Only add directories not already in ruff's defaults
@@ -22,16 +21,15 @@ target-version = "py311"
 # .pytype, .ruff_cache, .svn, .tox, .venv, .vscode, __pypackages__,
 # _build, buck-out, build, dist, node_modules, site-packages, venv
 extend-exclude = [
-    "migrations",      # Database migrations (often auto-generated)
-    "*.pyi",           # Type stubs (if you want to exclude them)
+    "migrations",
+    "alembic/versions",
 ]
 
 # =============================================================================
 # LINTER CONFIGURATION
 # =============================================================================
-[tool.ruff.lint]
+[lint]
 # Use explicit `select` (not `extend-select`) for clarity and reproducibility
-# Reference: https://docs.astral.sh/ruff/linter/#rule-selection
 select = [
     # --- Core Python Rules ---
     "F",        # Pyflakes: detects logic errors (undefined names, unused imports)
@@ -94,18 +92,9 @@ ignore = [
     # --- Line length handled by formatter ---
     "E501",     # line-too-long (formatter handles this best-effort)
 
-    # --- Rules that conflict with ruff format ---
-    # See: https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
-    # If you're NOT using ruff format, you may want to enable some of these
-    # "COM812",   # missing-trailing-comma
-    # "ISC001",   # single-line-implicit-string-concatenation
-
     # --- Overly pedantic rules ---
     "RET504",   # unnecessary-assign: sometimes aids debugging
     "SIM108",   # if-else-block-instead-of-if-exp: ternary not always clearer
-
-    # --- Project-specific relaxations (customize as needed) ---
-    # "ARG001",   # unused-function-argument (useful for callbacks/interfaces)
 ]
 
 # Rules that should not be auto-fixed (require manual review)
@@ -124,7 +113,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # =============================================================================
 # PER-FILE RULE OVERRIDES
 # =============================================================================
-[tool.ruff.lint.per-file-ignores]
+[lint.per-file-ignores]
 # Test files have different requirements
 "**/test_*.py" = [
     "ARG001",   # Unused arguments common in test fixtures
@@ -155,15 +144,14 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Database seeds/migrations have their own conventions
 "**/migrations/**/*.py" = ["N", "E501", "ERA"]
+"**/alembic/**/*.py" = ["N", "E501", "ERA"]
 "**/seeds/**/*.py" = ["N815", "E501"]
 "**/db_seed/**/*.py" = ["N815", "E501"]
 
 # =============================================================================
 # ISORT CONFIGURATION
 # =============================================================================
-[tool.ruff.lint.isort]
-# Use a single section for first-party imports
-known-first-party = []  # Add your package names here, e.g., ["mypackage"]
+[lint.isort]
 # Force imports to be sorted within sections
 force-sort-within-sections = true
 # Split imports from `from` imports
@@ -174,13 +162,13 @@ lines-after-imports = 2
 # =============================================================================
 # PYCODESTYLE CONFIGURATION
 # =============================================================================
-[tool.ruff.lint.pycodestyle]
-max-doc-length = 88  # Match line-length for docstrings
+[lint.pycodestyle]
+max-doc-length = 88
 
 # =============================================================================
 # FLAKE8-BUGBEAR CONFIGURATION
 # =============================================================================
-[tool.ruff.lint.flake8-bugbear]
+[lint.flake8-bugbear]
 # Extend the list of functions that are allowed in default arguments
 extend-immutable-calls = [
     "fastapi.Depends",
@@ -195,7 +183,7 @@ extend-immutable-calls = [
 # =============================================================================
 # FLAKE8-TYPE-CHECKING CONFIGURATION
 # =============================================================================
-[tool.ruff.lint.flake8-type-checking]
+[lint.flake8-type-checking]
 # Exempt commonly used runtime-required imports from TC rules
 runtime-evaluated-base-classes = [
     "pydantic.BaseModel",
@@ -209,38 +197,33 @@ runtime-evaluated-decorators = [
 # =============================================================================
 # PYLINT CONFIGURATION (if PL rules enabled)
 # =============================================================================
-[tool.ruff.lint.pylint]
-max-args = 7           # Max function arguments before warning
-max-branches = 12      # Max branches in a function
-max-returns = 6        # Max return statements
-max-statements = 50    # Max statements in a function
+[lint.pylint]
+max-args = 7
+max-branches = 12
+max-returns = 6
+max-statements = 50
 
 # =============================================================================
 # MCCABE COMPLEXITY (if C90 enabled)
 # =============================================================================
-[tool.ruff.lint.mccabe]
-max-complexity = 10    # Maximum cyclomatic complexity
+[lint.mccabe]
+max-complexity = 10
 
 # =============================================================================
 # PYTEST STYLE CONFIGURATION
 # =============================================================================
-[tool.ruff.lint.flake8-pytest-style]
-fixture-parentheses = false    # @pytest.fixture not @pytest.fixture()
-mark-parentheses = false       # @pytest.mark.foo not @pytest.mark.foo()
-parametrize-names-type = "tuple"  # Use tuples for parametrize names
+[lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+parametrize-names-type = "tuple"
 
 # =============================================================================
 # FORMATTER CONFIGURATION (if using ruff format)
 # =============================================================================
-[tool.ruff.format]
-# Use double quotes (consistent with Black)
+[format]
 quote-style = "double"
-# Use spaces for indentation
 indent-style = "space"
-# Respect magic trailing comma (prevents formatter from collapsing)
 skip-magic-trailing-comma = false
-# Use Unix-style line endings
 line-ending = "lf"
-# Format docstrings
 docstring-code-format = true
 docstring-code-line-length = 72
