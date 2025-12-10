@@ -1,0 +1,246 @@
+# =============================================================================
+# RUFF CONFIGURATION
+# =============================================================================
+# Documentation: https://docs.astral.sh/ruff/configuration/
+# Rules reference: https://docs.astral.sh/ruff/rules/
+# =============================================================================
+
+[tool.ruff]
+# Require a specific ruff version range for consistent behavior across environments
+required-version = ">=0.8.0"
+
+# Match Black's default for consistency
+line-length = 88
+indent-width = 4
+
+# Minimum Python version to target (adjust per-repo if needed)
+target-version = "py311"
+
+# Only add directories not already in ruff's defaults
+# Ruff already excludes: .bzr, .direnv, .eggs, .git, .git-rewrite, .hg,
+# .ipynb_checkpoints, .mypy_cache, .nox, .pants.d, .pyenv, .pytest_cache,
+# .pytype, .ruff_cache, .svn, .tox, .venv, .vscode, __pypackages__,
+# _build, buck-out, build, dist, node_modules, site-packages, venv
+extend-exclude = [
+    "migrations",      # Database migrations (often auto-generated)
+    "*.pyi",           # Type stubs (if you want to exclude them)
+]
+
+# =============================================================================
+# LINTER CONFIGURATION
+# =============================================================================
+[tool.ruff.lint]
+# Use explicit `select` (not `extend-select`) for clarity and reproducibility
+# Reference: https://docs.astral.sh/ruff/linter/#rule-selection
+select = [
+    # --- Core Python Rules ---
+    "F",        # Pyflakes: detects logic errors (undefined names, unused imports)
+    "E",        # pycodestyle errors: basic style errors
+    "W",        # pycodestyle warnings: style warnings
+
+    # --- Code Quality ---
+    "B",        # flake8-bugbear: catches common bugs and design problems
+    "C4",       # flake8-comprehensions: better list/dict/set comprehensions
+    "SIM",      # flake8-simplify: suggests code simplifications
+    "PIE",      # flake8-pie: misc. lints (no pointless statements, etc.)
+
+    # --- Import Management ---
+    "I",        # isort: import sorting and organization
+    "TID",      # flake8-tidy-imports: import hygiene (banned imports, etc.)
+
+    # --- Modernization ---
+    "UP",       # pyupgrade: upgrade syntax for newer Python versions
+    "FA",       # flake8-future-annotations: enforce `from __future__ import annotations`
+    "YTT",      # flake8-2020: checks for misuse of sys.version
+
+    # --- Type Checking ---
+    "TCH",      # flake8-type-checking: move imports to TYPE_CHECKING blocks
+    "PYI",      # flake8-pyi: rules for type stub files
+
+    # --- Async Code ---
+    "ASYNC",    # flake8-async: async/await best practices
+
+    # --- Code Hygiene ---
+    "T10",      # flake8-debugger: no leftover debugger calls
+    "T20",      # flake8-print: no print statements in production code
+    "ERA",      # eradicate: detect commented-out code
+    "ARG",      # flake8-unused-arguments: detect unused function arguments
+
+    # --- Performance ---
+    "PERF",     # Perflint: performance anti-patterns
+    "FLY",      # flynt: prefer f-strings over .format() and %
+
+    # --- Return/Raise Statements ---
+    "RET",      # flake8-return: checks for proper return statements
+    "RSE",      # flake8-raise: checks for proper raise statements
+
+    # --- Naming Conventions ---
+    "N",        # pep8-naming: naming conventions
+
+    # --- Testing ---
+    "PT",       # flake8-pytest-style: pytest best practices
+
+    # --- Slots ---
+    "SLOT",     # flake8-slots: require __slots__ for simple classes
+
+    # --- Executable Files ---
+    "EXE",      # flake8-executable: shebang and executable file checks
+
+    # --- Ruff-Specific ---
+    "RUF",      # Ruff-specific rules
+]
+
+ignore = [
+    # --- Line length handled by formatter ---
+    "E501",     # line-too-long (formatter handles this best-effort)
+
+    # --- Rules that conflict with ruff format ---
+    # See: https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    # If you're NOT using ruff format, you may want to enable some of these
+    # "COM812",   # missing-trailing-comma
+    # "ISC001",   # single-line-implicit-string-concatenation
+
+    # --- Overly pedantic rules ---
+    "RET504",   # unnecessary-assign: sometimes aids debugging
+    "SIM108",   # if-else-block-instead-of-if-exp: ternary not always clearer
+
+    # --- Project-specific relaxations (customize as needed) ---
+    # "ARG001",   # unused-function-argument (useful for callbacks/interfaces)
+]
+
+# Rules that should not be auto-fixed (require manual review)
+unfixable = [
+    "ERA001",   # Don't auto-delete commented code (needs manual review)
+    "F401",     # Don't auto-remove unused imports (might be re-exports)
+    "F841",     # Don't auto-remove unused variables (might be intentional)
+]
+
+# Allow autofix for all enabled rules when `--fix` is passed
+fixable = ["ALL"]
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# =============================================================================
+# PER-FILE RULE OVERRIDES
+# =============================================================================
+[tool.ruff.lint.per-file-ignores]
+# Test files have different requirements
+"**/test_*.py" = [
+    "ARG001",   # Unused arguments common in test fixtures
+    "ARG002",   # Unused method arguments
+    "S101",     # assert is expected in tests
+    "PLR2004",  # Magic values acceptable in tests
+    "PT004",    # Fixtures that don't return anything
+    "PT013",    # pytest.raises block is fine
+    "RUF018",   # Assignment in assert is fine in tests
+]
+"**/tests/**/*.py" = [
+    "ARG001", "ARG002", "S101", "PLR2004", "PT004", "PT013", "RUF018",
+]
+"**/conftest.py" = [
+    "ARG001",   # Fixture parameters
+    "ARG002",
+]
+
+# __init__.py files often have "unused" imports for re-export
+"**/__init__.py" = [
+    "F401",     # Unused imports (re-exports)
+    "F403",     # Star imports (sometimes used for API surface)
+]
+
+# Scripts and CLI tools may use print
+"**/scripts/**/*.py" = ["T20"]
+"**/cli/**/*.py" = ["T20"]
+
+# Database seeds/migrations have their own conventions
+"**/migrations/**/*.py" = ["N", "E501", "ERA"]
+"**/seeds/**/*.py" = ["N815", "E501"]
+"**/db_seed/**/*.py" = ["N815", "E501"]
+
+# =============================================================================
+# ISORT CONFIGURATION
+# =============================================================================
+[tool.ruff.lint.isort]
+# Use a single section for first-party imports
+known-first-party = []  # Add your package names here, e.g., ["mypackage"]
+# Force imports to be sorted within sections
+force-sort-within-sections = true
+# Split imports from `from` imports
+split-on-trailing-comma = true
+# Number of lines after imports
+lines-after-imports = 2
+
+# =============================================================================
+# PYCODESTYLE CONFIGURATION
+# =============================================================================
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 88  # Match line-length for docstrings
+
+# =============================================================================
+# FLAKE8-BUGBEAR CONFIGURATION
+# =============================================================================
+[tool.ruff.lint.flake8-bugbear]
+# Extend the list of functions that are allowed in default arguments
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "typer.Option",
+    "typer.Argument",
+]
+
+# =============================================================================
+# FLAKE8-TYPE-CHECKING CONFIGURATION
+# =============================================================================
+[tool.ruff.lint.flake8-type-checking]
+# Exempt commonly used runtime-required imports from TC rules
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "sqlalchemy.orm.DeclarativeBase",
+]
+runtime-evaluated-decorators = [
+    "dataclasses.dataclass",
+    "pydantic.validate_call",
+]
+
+# =============================================================================
+# PYLINT CONFIGURATION (if PL rules enabled)
+# =============================================================================
+[tool.ruff.lint.pylint]
+max-args = 7           # Max function arguments before warning
+max-branches = 12      # Max branches in a function
+max-returns = 6        # Max return statements
+max-statements = 50    # Max statements in a function
+
+# =============================================================================
+# MCCABE COMPLEXITY (if C90 enabled)
+# =============================================================================
+[tool.ruff.lint.mccabe]
+max-complexity = 10    # Maximum cyclomatic complexity
+
+# =============================================================================
+# PYTEST STYLE CONFIGURATION
+# =============================================================================
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false    # @pytest.fixture not @pytest.fixture()
+mark-parentheses = false       # @pytest.mark.foo not @pytest.mark.foo()
+parametrize-names-type = "tuple"  # Use tuples for parametrize names
+
+# =============================================================================
+# FORMATTER CONFIGURATION (if using ruff format)
+# =============================================================================
+[tool.ruff.format]
+# Use double quotes (consistent with Black)
+quote-style = "double"
+# Use spaces for indentation
+indent-style = "space"
+# Respect magic trailing comma (prevents formatter from collapsing)
+skip-magic-trailing-comma = false
+# Use Unix-style line endings
+line-ending = "lf"
+# Format docstrings
+docstring-code-format = true
+docstring-code-line-length = 72
