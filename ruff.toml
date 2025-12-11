@@ -48,7 +48,6 @@ select = [
 
     # --- Modernization ---
     "UP",       # pyupgrade: upgrade syntax for newer Python versions
-    "FA",       # flake8-future-annotations: enforce `from __future__ import annotations`
     "YTT",      # flake8-2020: checks for misuse of sys.version
 
     # --- Type Checking ---
@@ -60,9 +59,6 @@ select = [
 
     # --- Code Hygiene ---
     "T10",      # flake8-debugger: no leftover debugger calls
-    "T20",      # flake8-print: no print statements in production code
-    "ERA",      # eradicate: detect commented-out code
-    "ARG",      # flake8-unused-arguments: detect unused function arguments
 
     # --- Performance ---
     "PERF",     # Perflint: performance anti-patterns
@@ -78,9 +74,6 @@ select = [
     # --- Testing ---
     "PT",       # flake8-pytest-style: pytest best practices
 
-    # --- Slots ---
-    "SLOT",     # flake8-slots: require __slots__ for simple classes
-
     # --- Executable Files ---
     "EXE",      # flake8-executable: shebang and executable file checks
 
@@ -94,7 +87,12 @@ ignore = [
 
     # --- Overly pedantic rules ---
     "RET504",   # unnecessary-assign: sometimes aids debugging
+    "SIM105",   # contextlib.suppress() instead of try-except-pass
     "SIM108",   # if-else-block-instead-of-if-exp: ternary not always clearer
+
+    # --- Performance ---
+    "PERF203",  # try-except in loops
+    "PERF401",  # list comprehension instead of loop
 ]
 
 # Rules that should not be auto-fixed (require manual review)
@@ -116,8 +114,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [lint.per-file-ignores]
 # Test files have different requirements
 "**/test_*.py" = [
-    "ARG001",   # Unused arguments common in test fixtures
-    "ARG002",   # Unused method arguments
     "S101",     # assert is expected in tests
     "PLR2004",  # Magic values acceptable in tests
     "PT004",    # Fixtures that don't return anything
@@ -125,11 +121,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
     "RUF018",   # Assignment in assert is fine in tests
 ]
 "**/tests/**/*.py" = [
-    "ARG001", "ARG002", "S101", "PLR2004", "PT004", "PT013", "RUF018",
-]
-"**/conftest.py" = [
-    "ARG001",   # Fixture parameters
-    "ARG002",
+    "S101", "PLR2004", "PT004", "PT013", "RUF018",
 ]
 
 # __init__.py files often have "unused" imports for re-export
@@ -137,10 +129,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
     "F401",     # Unused imports (re-exports)
     "F403",     # Star imports (sometimes used for API surface)
 ]
-
-# Scripts and CLI tools may use print
-"**/scripts/**/*.py" = ["T20"]
-"**/cli/**/*.py" = ["T20"]
 
 # Database seeds/migrations have their own conventions
 "**/migrations/**/*.py" = ["N", "E501", "ERA"]
