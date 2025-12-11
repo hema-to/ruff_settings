@@ -84,6 +84,7 @@ select = [
 ignore = [
     # --- Line length handled by formatter ---
     "E501",     # line-too-long (formatter handles this best-effort)
+    "W505",     # doc line too long
 
     # --- Overly pedantic rules ---
     "RET504",   # unnecessary-assign: sometimes aids debugging
