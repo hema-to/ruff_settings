@@ -147,6 +147,16 @@ force-sort-within-sections = true
 split-on-trailing-comma = true
 # Number of lines after imports
 lines-after-imports = 2
+known-first-party = [
+    "flowgate",
+    "hemato_core",
+    "hemato_data_utils",
+    "hemato_experiments",
+    "hemato_mlops",
+    "hemato_ml_tools",
+    "hemato_study",
+    "data_engineering",
+]
 
 # =============================================================================
 # PYCODESTYLE CONFIGURATION

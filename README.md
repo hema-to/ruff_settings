@@ -32,7 +32,7 @@ Add an additional hook to your `.pre-commit-config.yaml` file before the ruff ho
     hooks:
       - id: fetch-ruff-config
         name: Fetch shared ruff config
-        entry: bash -c 'curl -sSL https://raw.githubusercontent.com/hema-to/ruff_settings/main/ruff.toml -o .ruff-base.toml'
+        entry: "bash -c 'curl -sSL -H \"Cache-Control: no-cache\" https://raw.githubusercontent.com/hema-to/ruff_settings/main/ruff.toml -o .ruff-base.toml'"
         language: system
         always_run: true
         pass_filenames: false
